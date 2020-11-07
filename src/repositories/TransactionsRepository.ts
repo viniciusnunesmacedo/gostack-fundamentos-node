@@ -1,9 +1,12 @@
 import Transaction from '../models/Transaction';
 
 interface Balance {
-  income: number;
-  outcome: number;
-  total: number;
+  transactions: Transaction[];
+  balance: {
+    income: number;
+    outcome: number;
+    total: number;
+  };
 }
 
 class TransactionsRepository {
@@ -14,15 +17,42 @@ class TransactionsRepository {
   }
 
   public all(): Transaction[] {
-    // TODO
+    return this.transactions;
   }
 
   public getBalance(): Balance {
-    // TODO
+    let totalIncome = 0.0;
+    let totalOutcome = 0.0;
+    let totalTransaction = 0;
+
+    this.transactions.map(transaction => {
+      if (transaction.type === 'income') {
+        totalIncome += transaction.value;
+      } else {
+        totalOutcome += transaction.value;
+      }
+    });
+
+    totalTransaction = totalIncome - totalOutcome;
+
+    const balance: Balance = {
+      transactions: this.transactions,
+      balance: {
+        income: totalIncome,
+        outcome: totalOutcome,
+        total: totalTransaction,
+      },
+    };
+
+    return balance;
   }
 
-  public create(): Transaction {
-    // TODO
+  public create({ title, value, type }: Transaction): Transaction {
+    const transaction = new Transaction({ title, value, type });
+
+    this.transactions.push(transaction);
+
+    return transaction;
   }
 }
 
